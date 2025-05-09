@@ -87,6 +87,9 @@ defineProps<{
     padding: 10px;
     box-sizing: border-box;
 }
+span{
+    font-size: xx-large;
+}
 
 .card-image {
     max-width: 100%;
