@@ -72,7 +72,7 @@ onMounted(resetGame);
     <div class="cards-grid">
       <MemoryCard @click="openCard(index)" v-for="(card, index) in cards" :disabled="hasTwoCardsOpened" :key="index" :status="getStatus(index)" :image="card.emoji"/>
     </div>
-     <h1 v-if="isGameWon">You win!!</h1>
+     <h1 style="color:red" v-if="isGameWon">You finished.</h1>
   </div>
 </template>
 <style scoped>
