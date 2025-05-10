@@ -22,7 +22,7 @@ const totalPairs = symbols.length * 2
 const matched = computed(()=>matchedCards.value.size)
 const hasTwoCardsOpened = computed(()=>openCards.value.size===2);
 const move = ref<number>(0)
-const isGamewon = computed(()=>matched.value === totalPairs)
+const isGameWon = computed(()=>matched.value === totalPairs)
 function resetGame(){
     move.value = 0;
     openCards.value.clear();
@@ -42,13 +42,12 @@ function getStatus(index:number){
 const CLOSE_TIMEOUT = 1000;
 const openCard = (index: number) => {
   if (getStatus(index) !== 'closed' || hasTwoCardsOpened.value) return;
-  move.value++;
   openCards.value.add(index);
 };
 
 watch(hasTwoCardsOpened, (areTwoCardsOpen) => {
   if (!areTwoCardsOpen) return;
-  
+  move.value++;
   const [firstIndex, secondIndex] = [...openCards.value];
   const isMatch = cards.value[firstIndex].id === cards.value[secondIndex].id;
 
@@ -73,7 +72,7 @@ onMounted(resetGame);
     <div class="cards-grid">
       <MemoryCard @click="openCard(index)" v-for="(card, index) in cards" :disabled="hasTwoCardsOpened" :key="index" :status="getStatus(index)" :image="card.emoji"/>
     </div>
-     <h1 v-if="isGamewon">You won!!!</h1>
+     <h1 v-if="isGameWon">You win!!</h1>
   </div>
 </template>
 <style scoped>
@@ -99,6 +98,36 @@ button {
   max-width: 500px;
   margin: 0 auto;
 }
+@media (max-width: 600px) {
+  .cards-grid {
+    grid-template-columns: repeat(3, 1fr); /* 3 колонки на маленьких экранах */
+    gap: 6px;
+  }
+  
+  .card {
+    width: 80px;
+    height: 80px;
+  }
+  
+  button {
+    padding: 14px 28px; /* Увеличиваем кнопку */
+    font-size: 18px;
+  }
+  
+  .stats {
+    font-size: 16px;
+  }
+}
 
+@media (max-width: 400px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 колонки на очень маленьких экранах */
+  }
+  
+  .card {
+    width: 70px;
+    height: 70px;
+  }
+}
 
 </style>

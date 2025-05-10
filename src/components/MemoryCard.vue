@@ -101,4 +101,26 @@ span{
     cursor: not-allowed;
     opacity: 0.7;
 }
+
+@media (max-width: 600px) {
+    .card {
+        width: 80px;
+        height: 80px;
+    }
+    
+    span {
+        font-size: x-large;
+    }
+}
+
+@media (max-width: 400px) {
+    .card {
+        width: 70px;
+        height: 70px;
+    }
+    
+    span {
+        font-size: large;
+    }
+}
 </style>
