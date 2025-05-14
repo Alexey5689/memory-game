@@ -1,133 +1,149 @@
 <script setup lang="ts">
-
 import { ref, onMounted, computed, watch } from 'vue';
 import MemoryCard from './components/MemoryCard.vue';
 
 const symbols = [
-  { id: 1, emoji: "🐶", name: "Собака" },
-  { id: 2, emoji: "🐱", name: "Кошка" },
-  { id: 3, emoji: "🐭", name: "Мышь" },
-  { id: 4, emoji: "🐹", name: "Хомяк" },
-  { id: 5, emoji: "🐰", name: "Кролик" },
-  { id: 6, emoji: "🦊", name: "Лиса" },
-  { id: 7, emoji: "🐻", name: "Медведь" },
-  { id: 8, emoji: "🐼", name: "Панда" },
+    { id: 1, emoji: '🐶', name: 'Собака' },
+    { id: 2, emoji: '🐱', name: 'Кошка' },
+    { id: 3, emoji: '🐭', name: 'Мышь' },
+    { id: 4, emoji: '🐹', name: 'Хомяк' },
+    { id: 5, emoji: '🐰', name: 'Кролик' },
+    { id: 6, emoji: '🦊', name: 'Лиса' },
+    { id: 7, emoji: '🐻', name: 'Медведь' },
+    { id: 8, emoji: '🐼', name: 'Панда' },
 ];
 
-const cards:any = ref([]);
+const cards: any = ref([]);
 
 const matchedCards = ref(new Set<number>());
-const openCards = ref(new Set<number>())
-const totalPairs = symbols.length * 2
-const matched = computed(()=>matchedCards.value.size)
-const hasTwoCardsOpened = computed(()=>openCards.value.size===2);
-const move = ref<number>(0)
-const isGameWon = computed(()=>matched.value === totalPairs)
-function resetGame(){
+const openCards = ref(new Set<number>());
+const totalPairs = symbols.length * 2;
+const matched = computed(() => matchedCards.value.size);
+const hasTwoCardsOpened = computed(() => openCards.value.size === 2);
+const move = ref<number>(0);
+const isGameWon = computed(() => matched.value === totalPairs);
+function resetGame() {
     move.value = 0;
     openCards.value.clear();
     matchedCards.value.clear();
-    cards.value = [...symbols, ...symbols].sort(() => Math.random() - 0.5);
+    cards.value = [...symbols, ...symbols].sort(() => Math.random() - 1);
 }
 
-function getStatus(index:number){
-    if(openCards.value.has(index)){
+function getStatus(index: number) {
+    if (openCards.value.has(index)) {
         return 'opened';
     }
-    if(matchedCards.value.has(index)){
+    if (matchedCards.value.has(index)) {
         return 'matched';
     }
     return 'closed';
 }
 const CLOSE_TIMEOUT = 1000;
 const openCard = (index: number) => {
-  if (getStatus(index) !== 'closed' || hasTwoCardsOpened.value) return;
-  openCards.value.add(index);
+    if (getStatus(index) !== 'closed' || hasTwoCardsOpened.value) return;
+    openCards.value.add(index);
 };
 
 watch(hasTwoCardsOpened, (areTwoCardsOpen) => {
-  if (!areTwoCardsOpen) return;
-  move.value++;
-  const [firstIndex, secondIndex] = [...openCards.value];
-  const isMatch = cards.value[firstIndex].id === cards.value[secondIndex].id;
+    if (!areTwoCardsOpen) return;
+    move.value++;
+    const [firstIndex, secondIndex] = [...openCards.value];
+    const isMatch = cards.value[firstIndex].id === cards.value[secondIndex].id;
 
-  setTimeout(() => {
-    if (isMatch) {
-      matchedCards.value.add(firstIndex);
-      matchedCards.value.add(secondIndex);
-    }
-    openCards.value.clear();
-  }, CLOSE_TIMEOUT);
+    setTimeout(() => {
+        if (isMatch) {
+            matchedCards.value.add(firstIndex);
+            matchedCards.value.add(secondIndex);
+        }
+        openCards.value.clear();
+    }, CLOSE_TIMEOUT);
 });
 onMounted(resetGame);
 </script>
 <template>
-  <div class="memory-game">
-    <h1>Memory Game</h1>
-    <div class="controls">
-      <button @click="resetGame">Новая игра</button>
-      <p>Попытки: {{ move }}</p>
-      <p>Совпадения: {{ matched }}/ {{ totalPairs }}</p>
+    <div class="memory-game">
+        <h1>Memory Game</h1>
+        <div class="controls">
+            <button @click="resetGame">Новая игра</button>
+            <p>Попытки: {{ move }}</p>
+            <p>Совпадения: {{ matched }}/{{ totalPairs }}</p>
+        </div>
+        <div class="cards-grid">
+            <MemoryCard
+                @click="openCard(index)"
+                v-for="(card, index) in cards"
+                :disabled="hasTwoCardsOpened"
+                :key="index"
+                :status="getStatus(index)"
+                :image="card.emoji"
+            />
+        </div>
+        <h1 style="color: red" v-if="isGameWon">You finished.</h1>
     </div>
-    <div class="cards-grid">
-      <MemoryCard @click="openCard(index)" v-for="(card, index) in cards" :disabled="hasTwoCardsOpened" :key="index" :status="getStatus(index)" :image="card.emoji"/>
-    </div>
-     <h1 style="color:red" v-if="isGameWon">You finished.</h1>
-  </div>
 </template>
 <style scoped>
 .memory-game {
-  text-align: center;
-  padding: 20px;
+    text-align: center;
+    padding: 20px;
 }
 
 .controls {
-  margin-bottom: 20px;
+    margin-bottom: 20px;
 }
-
+h1 {
+    color: #42b983;
+}
 button {
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 8px;
+    background-color: #42b983;
+    color: rgb(255, 255, 255);
+    border-color: whitesmoke;
+}
+button:hover {
+    background-color: #ffffff;
+    color: #3a4e64;
+    border-color: #3a4e64;
 }
 
 .cards-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  max-width: 500px;
-  margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    max-width: 500px;
+    margin: 0 auto;
 }
 @media (max-width: 600px) {
-  .cards-grid {
-    grid-template-columns: repeat(3, 1fr); /* 3 колонки на маленьких экранах */
-    gap: 6px;
-  }
-  
-  .card {
-    width: 80px;
-    height: 80px;
-  }
-  
-  button {
-    padding: 14px 28px; /* Увеличиваем кнопку */
-    font-size: 18px;
-  }
-  
-  .stats {
-    font-size: 16px;
-  }
+    .cards-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+    }
+
+    .card {
+        width: 80px;
+        height: 80px;
+    }
+
+    button {
+        padding: 14px 28px;
+        font-size: 18px;
+    }
+
+    .stats {
+        font-size: 16px;
+    }
 }
 
 @media (max-width: 400px) {
-  .cards-grid {
-    grid-template-columns: repeat(2, 1fr); /* 2 колонки на очень маленьких экранах */
-  }
-  
-  .card {
-    width: 70px;
-    height: 70px;
-  }
-}
+    .cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 
+    .card {
+        width: 70px;
+        height: 70px;
+    }
+}
 </style>
